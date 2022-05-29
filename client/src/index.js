@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AuthErrorEventBus } from './context/AuthContext';
 
 const baseURL = process.env.REACT_APP_BASE_URL;
+console.log(baseURL);
 const authErrorEventBus = new AuthErrorEventBus();
 const authService = new AuthService();
 const tweetService = new TweetService(baseURL);
@@ -16,13 +17,10 @@ const tweetService = new TweetService(baseURL);
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <AuthProvider
-        authService={authService}
-        authErrorEventBus={authErrorEventBus}
-      >
+      <AuthProvider authService={authService} authErrorEventBus={authErrorEventBus}>
         <App tweetService={tweetService} />
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
