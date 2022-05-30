@@ -1,40 +1,18 @@
 import express from 'express';
 import 'express-async-errors';
-
-let tweets = [
-  {
-    id: '1',
-    text: 'test',
-    createdAt: Date.now().toString(),
-    name: 'Bob',
-    username: 'bob',
-    url: 'https://picsum.photos/64/64',
-  },
-  {
-    id: '2',
-    text: 'test2',
-    createdAt: Date.now().toString(),
-    name: 'Clarko',
-    username: 'clarko',
-    url: 'https://picsum.photos/64/64',
-  },
-];
+import * as tweetRepository from '../data/tweet.js';
 
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
   const username = req.query.username;
-  const data = username
-    ? tweets.filter((tweet) => {
-        return tweet.username === username;
-      })
-    : tweets;
+  const data = username ? tweetRepository.getAllByUsername(username) : tweetRepository.getAll();
   res.status(200).json(data);
 });
 
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
-  const data = tweets.find((tweet) => tweet.id === id);
+  const data = tweetRepository.getById(id);
 
   if (data) {
     return res.status(200).json(data);
@@ -44,23 +22,15 @@ router.get('/:id', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
   const { text, name, username } = req.body;
-  const tweet = {
-    id: Date.now().toString(),
-    text,
-    name,
-    username,
-    createdAt: Date.now(),
-  };
-  tweets = [tweet, ...tweets];
+  const tweet = tweetRepository.create(text, name, username);
   res.status(201).json(tweet);
 });
 
 router.put('/:id', (req, res, next) => {
   const id = req.params.id;
   const text = req.body.text;
-  const tweet = tweets.find((tweet) => tweet.id === id);
+  const tweet = tweetRepository.update(id, text);
   if (tweet) {
-    tweet.text = text;
     return res.status(200).json(tweet);
   }
   return res.status(404).json({ message: `Tweet id ${id} not found` });
@@ -68,7 +38,7 @@ router.put('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
   const id = req.params.id;
-  tweets = tweets.filter((tweet) => tweet.id !== id);
+  tweetRepository.remove();
   res.sendStatus(204);
 });
 
